@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,5 +21,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'beto@gmail.com',
             'password' => bcrypt('123456789'),
         ]);
+        $this->call(PagosTableSeeder::class);
+ 
     }
 }
