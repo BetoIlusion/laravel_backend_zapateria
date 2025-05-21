@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Pago extends Model
+class Persona extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'tipoPago',
-        'id_compra'
+        'nombre',
+        'telefono',
     ];
     protected $casts = [
         'created_at' => 'datetime',
@@ -20,10 +20,13 @@ class Pago extends Model
         'created_at',
         'updated_at',
     ];
-    public function compra()
+    public function user()
     {
-        return $this->belongsTo(Compra::class, 'id_compra');
+        return $this->hasOne(User::class, 'id_persona');
     }
-    
+    public function cliente()
+    {
+        return $this->hasOne(Cliente::class, 'id_persona');
+    }
 
 }

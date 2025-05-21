@@ -24,16 +24,17 @@ class CompraController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'cantidad' => 'required|integer',
-            'destino' => 'required|string|max:255',
-            'estadoEntrega' => 'required|string|max:255',
+            'fecha_solicitud' => 'required|date',
+            'total' => 'required|numeric',
+            'id_cliente' => 'required|exists:clientes,id',
         ]);
+
         $compra = new Compra();
-        $compra->cantidad = $request->cantidad;
-        $compra->destino = $request->destino;
-        $compra->estadoEntrega = $request->estadoEntrega;
-        $compra->pago_id = $request->pago_id; // Asumiendo que el ID de pago se pasa en la solicitud
+        $compra->fecha_solicitud = $request->fecha_solicitud;
+        $compra->total = $request->total;
+        $compra->id_cliente = $request->id_cliente;
         $compra->save();
+
         return response()->json(['message' => 'Compra created successfully', 'compra' => $compra], 201);
     }
     public function update(Request $request, $id)
@@ -56,5 +57,13 @@ class CompraController extends Controller
         }
         $compra->delete();
         return response()->json(['message' => 'Compra deleted successfully']);
+    }
+    public function showPagos($id)
+    {
+        $compra = Compra::with('pago')->find($id);
+        if (!$compra) {
+            return response()->json(['message' => 'Compra not found'], 404);
+        }
+        return response()->json($compra->pago);
     }
 }
