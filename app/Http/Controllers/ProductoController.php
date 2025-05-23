@@ -87,6 +87,27 @@ class ProductoController extends Controller
 
     public function destroy($id)
     {
-        // Aquí puedes implementar la lógica para eliminar un producto
+        $user = auth()->user();
+        $producto = Producto::where('id_usuario', $user->id)->find($id);
+
+        if (!$producto) {
+            return response()->json(['message' => 'Producto no encontrado'], 404);
+        }
+
+        $producto->delete();
+
+        return response()->json(['message' => 'Producto eliminado'], 200);
+    }
+    
+    public function exists($nombre)
+    {
+        $user = auth()->user();
+        $producto = Producto::where('id_usuario', $user->id)->where('nombre', $nombre)->first();
+
+        if ($producto) {
+            return response()->json(['exists' => true]);
+        } else {
+            return response()->json(['exists' => false]);
+        }
     }
 }

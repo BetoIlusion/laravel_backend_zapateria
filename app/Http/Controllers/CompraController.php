@@ -23,16 +23,11 @@ class CompraController extends Controller
     }
     public function store(Request $request)
     {
-        $request->validate([
-            'fecha_solicitud' => 'required|date',
-            'total' => 'required|numeric',
-            'id_cliente' => 'required|exists:clientes,id',
-        ]);
-
+       
         $compra = new Compra();
         $compra->fecha_solicitud = $request->fecha_solicitud;
         $compra->total = $request->total;
-        $compra->id_cliente = $request->id_cliente;
+        $compra->id_usuario = $request->id_usuario;
         $compra->save();
 
         return response()->json(['message' => 'Compra created successfully', 'compra' => $compra], 201);

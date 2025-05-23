@@ -5,28 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Compra extends Model
+class Distribuidor extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'fecha_solicitud',
-        'total',
+        'tipo_vehiculo',
+        'estado_disponibilidad',
         'id_usuario'
     ];
     protected $casts = [
-        'fecha_solicitud' => 'datetime',
-        'total' => 'decimal:2',
+        'tipo_vehiculo' => 'string',
+        'estado_disponibilidad' => 'string',
         'id_usuario' => 'integer',
     ];
     protected $hidden = [
         'created_at',
         'updated_at',
     ];
- public function pagos()
+    public function vehiculo()
     {
-        return $this->hasMany(Pago::class, 'id_compra');
+        return $this->hasOne(Vehiculo::class, 'id_distribuidor');
     }
-    
-
 
 }

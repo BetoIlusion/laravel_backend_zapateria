@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->date('fecha_solicitud');
             $table->decimal('total', 10, 2);
-             $table->unsignedBigInteger('id_cliente');
-            //$table->foreign('id_cliente')->references('id')->on('clientes');
+             $table->unsignedBigInteger('id_usuario');
             $table->timestamps();
         });
     }

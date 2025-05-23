@@ -19,15 +19,11 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
 
         
-        $persona = new Persona();
-        $persona->nombre = 'beto';
-        $persona->telefono = '77889945';
-        $persona->save();
+        
         \App\Models\User::factory()->create([
             'name' => 'beto',
             'email' => 'beto@gmail.com',
-            'password' => bcrypt('123456789'),
-            'id_persona' => $persona->id,
+            'password' => bcrypt('123456789')
         ]);
         //$this->call(PagosTableSeeder::class);
  
