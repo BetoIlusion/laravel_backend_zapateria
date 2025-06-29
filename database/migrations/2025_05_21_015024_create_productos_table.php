@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->decimal('precio', 8, 2);
+            $table->decimal('volumen');
             $table->integer('stock');
             $table->text('descripcion');
-            $table->unsignedBigInteger('id_usuario');
+            $table->unsignedBigInteger('id_tipo');
             //$table->foreign('id_usuario')->references('id')->on('users');
             $table->timestamps();
         });

@@ -17,15 +17,20 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // \App\Models\User::factory(10)->create();
-
-        
         
         \App\Models\User::factory()->create([
             'name' => 'beto',
             'email' => 'beto@gmail.com',
+            'rol' => 'admin',
             'password' => bcrypt('123456789')
         ]);
         //$this->call(PagosTableSeeder::class);
+        $this->call([
+            TipoProductoSeeder::class,
+            ProductoSeeder::class,
+            UserSeeder::class,
+            MetodoPagoSeeder::class
+        ]);
  
     }
 }

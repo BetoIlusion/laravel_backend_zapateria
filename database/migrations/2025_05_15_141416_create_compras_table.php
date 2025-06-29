@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('compras', function (Blueprint $table) {
             $table->id();
-            $table->date('fecha_solicitud');
-            $table->decimal('total', 10, 2);
-             $table->unsignedBigInteger('id_usuario');
+            $table->decimal('total', 10, 2)->default(0.0);
+            $table->unsignedBigInteger('id_usuario');
+            $table->unsignedBigInteger('id_metodo_pago');
             $table->timestamps();
         });
     }

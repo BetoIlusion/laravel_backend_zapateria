@@ -11,13 +11,27 @@ class Producto extends Model
     protected $fillable = [
         'nombre',
         'precio',
+        'volumen',
         'stock',
         'descripcion',
-        'id_usuario'
+        'id_tipo'
     ];
     protected $casts = [
         'precio' => 'decimal:2',
         'stock' => 'integer',
     ];
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+    public function tipoProducto()
+    {
+        return $this->belongsTo(TipoProducto::class, 'id_tipo');
+    }
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'id_usuario');
+    }
+
 
 }

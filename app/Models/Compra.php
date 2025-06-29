@@ -9,24 +9,25 @@ class Compra extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'fecha_solicitud',
         'total',
-        'id_usuario'
+        'id_usuario',
+        'id_metodo_pago'
     ];
     protected $casts = [
-        'fecha_solicitud' => 'datetime',
         'total' => 'decimal:2',
         'id_usuario' => 'integer',
+        'id_metodo_pago' => 'integer'
     ];
     protected $hidden = [
         'created_at',
         'updated_at',
     ];
- public function pagos()
+    public function pagos()
     {
         return $this->hasMany(Pago::class, 'id_compra');
     }
-    
-
-
+    public function compra()
+    {
+        return $this->belongsTo(MetodoPago::class, 'id_metodo_pago');
+    }
 }

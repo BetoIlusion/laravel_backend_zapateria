@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'telefono',
         'email',
+        'rol',
         'password',
     ];
 
@@ -43,5 +44,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    public function updateUser()
+    {
+        $this->save();
+        return $this;
+    }
+    public function productos()
+    {
+        return $this->hasMany(Producto::class, 'id_usuario');
+    }
 
 }
