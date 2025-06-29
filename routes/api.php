@@ -63,11 +63,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // =============================================
     // 1ero crear el registro 'compra' para despues añadir a los registro de detalle_compra sus id_compra
     // ver como colocar el id_pago segun el enunciado del proyecto antes de crearlo
-    Route::post('/compra', [CompraController::class, 'store']);
+    Route::patch('/compra', [CompraController::class, 'crear']);
     // insertar Detalle de la compra(id_compra que generas) que es lo que estará registrado en el carrito(frontend)
     Route::post('/compra/detalle', [CompraController::class, 'storeDetalle']);
     // Luego usar este comando para sumar los subtotales en la compra e insertarlo en la compra creada, 
-    Route::patch('/compra/{id}/total', [CompraController::class, 'calcularTotal']);
+    Route::put('/compra/{id}/total', [CompraController::class, 'calcularTotal']);
     
 
 

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->decimal('total', 10, 2)->default(0.0);
             $table->unsignedBigInteger('id_usuario');
-            $table->unsignedBigInteger('id_metodo_pago');
+            $table->unsignedBigInteger('id_metodo_pago')->default(-1);
             $table->timestamps();
         });
     }

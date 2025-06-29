@@ -23,35 +23,18 @@ class CompraController extends Controller
         }
         return response()->json($compra);
     }
-    public function store(Request $request)
+    public function crear()
     {
         $user = auth()->user();
         if (!$user) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
-
-        $validator = Validator::make(
-            $request->all(),
-            [
-                'id_metodo_pago' => 'required|integer|exists:metodo_pagos,id'
-            ],
-            [
-                'required' => 'El campo :attribute es obligatorio.',
-                'integer' => 'El campo :attribute debe ser un número entero.',
-                'exists' => 'El :attribute seleccionado no es válido.',
-            ]
-        );
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-
         $compra = new Compra();
         $compra->id_usuario = $user->id;
-        $compra->id_metodo_pago = $request->id_metodo_pago;
         $compra->save();
+        $comprafinal = Compra::find($compra->id);
 
-        return response()->json(['message' => 'Compra created successfully', 'compra' => $compra], 201);
+        return response()->json(['message' => 'Compra created successfully', 'compra' => $comprafinal], 201);
     }
     public function update(Request $request, $id)
     {
@@ -112,8 +95,19 @@ class CompraController extends Controller
         return response()->json(['message' => 'Detalle de compra creado correctamente', 'detalle' => $detalle], 201);
     }
 
-    public function calcularTotal($id)
+    public function calcularTotal(Request $request, $id)
     {
+         $validator = Validator::make(
+            $request->all(),
+            [
+                'id_metodo_pago' => 'required|integer|exists:metodo_pagos,id'
+            ],
+            [
+                'required' => 'El campo :attribute es obligatorio.',
+                'integer' => 'El campo :attribute debe ser un número entero.',
+                'exists' => 'El :attribute seleccionado no es válido.',
+            ]
+        );
         $detalles = DetalleCompra::where('id_compra', $id)->get();
         if ($detalles->isEmpty()) {
             return response()->json(['message' => 'No hay detalles de compra para calcular el total'], 404);
@@ -121,7 +115,8 @@ class CompraController extends Controller
         $total = $detalles->sum('subtotal');
         $compra = Compra::find($id);
         $compra->total = $total;
-        $compra->save;
-        return response()->json(['message' => 'Total calculado y guardado correctamente', 'total' => $total]);
+        $compra->id_metodo_pago = $request->id_metodo_pago;
+        $compra->save();
+        return response()->json(['message' => 'Total calculado y guardado correctamente', 'total' => $compra]);
     }
 }
