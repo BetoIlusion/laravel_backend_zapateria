@@ -7,11 +7,8 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CompraController;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DistribuidorController;
 use App\Http\Controllers\ProductoController;
-use App\Http\Controllers\PagoController;
-use App\Models\DetalleCompra;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +47,12 @@ Route::prefix('distribuidor')->group(function () {
     //obtener UN distribuidor, se inserta id_usuario 
     //verificando que el id ingresado sea un distribuidor (tablas:usuario,distribuidor,ubicacion,vehiculo)
     Route::get('/{id}', [DistribuidorController::class, 'show']);
+    //Las 2 rutas son necesarias para registrar por completo un nuevo distribuidor
+    //Registrar DISTRIBUIDOR(crea el distribuidor por completo)
+    Route::post('/',[DistribuidorController::class,'registrar']);
+    //Insertar id_usuario(NO distribuidor->id). Actualiza vehiculo del Distribuidor 
+    Route::put('/{id}/vehiculo',[DistribuidorController::class, 'registrarVehiculo']);
+
 });
 
 
@@ -94,10 +97,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // =============================================
     // @RUTAS DE ASIGNACIONES
     // =============================================
+    //INSERTAR datos requeridos, este procesará con las condiciones establecidas
+    //de comparacion de volumenes de entrega Compra-Distribuidor
     Route::post('/asignacion', [AsignacionController::class, 'insertar']);
     // =============================================
     // @RUTAS DE OBSERVACIONES
     // =============================================
+    // el distribuidor verá que ingresar en las observaciones
     Route::post('/observacion',[AsignacionController::class,'insertarObservacion']);
 
 });

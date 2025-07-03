@@ -41,7 +41,7 @@ class UserSeeder extends Seeder
             'id_usuario' => $user->id
         ]);
         $distribuidor = Distribuidor::create([
-            'estado_disponibilidad' => 'desocupado',
+            'estado_disponibilidad' => 'libre',
             'id_usuario' => $user->id
         ]);
         Vehiculo::create([
@@ -66,7 +66,7 @@ class UserSeeder extends Seeder
             'id_usuario' => $user->id
         ]);
         $distribuidor = Distribuidor::create([
-            'estado_disponibilidad' => 'desocupado',
+            'estado_disponibilidad' => 'libre',
             'id_usuario' => $user->id
         ]);
         
@@ -92,7 +92,7 @@ class UserSeeder extends Seeder
             'id_usuario' => $user->id
         ]);
         $distribuidor = Distribuidor::create([
-            'estado_disponibilidad' => 'desocupado',
+            'estado_disponibilidad' => 'libre',
             'id_usuario' => $user->id
         ]);
         
@@ -118,7 +118,7 @@ class UserSeeder extends Seeder
             'id_usuario' => $user->id
         ]);
         $distribuidor = Distribuidor::create([
-            'estado_disponibilidad' => 'desocupado',
+            'estado_disponibilidad' => 'libre',
             'id_usuario' => $user->id
         ]);
         

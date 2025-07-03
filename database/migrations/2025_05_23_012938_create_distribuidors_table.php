@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('distribuidors', function (Blueprint $table) {
             $table->id();
-            $table->string('estado_disponibilidad');
+            $table->string('estado_disponibilidad')->default('libre');
             $table->unsignedBigInteger('id_usuario');            
             $table->timestamps();
         });

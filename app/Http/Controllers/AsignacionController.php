@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 use App\Models\Compra;
 use App\Models\Distribuidor;
+use App\Models\Observacion;
 use App\Models\Vehiculo;
 
 
@@ -125,7 +126,48 @@ class AsignacionController extends Controller
     {
         //
     }
-    public function insertarObservacion(){
-        
+    public function insertarObservacion(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'id_asignacion' => ['required', 'integer'],
+            'id_distribuidor' => ['required', 'integer'],
+            'ubicacion_entrega' => ['required', 'string'],
+            'observacion' => ['required', 'integer'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+        $tipoObservacion = $request->input('observacion');
+        $observacionString = "";
+        if ($tipoObservacion == 1) {
+            $observacionString = "entregado";
+        } elseif ($tipoObservacion == 2) {
+            $observacionString = "no entregado";
+        } elseif ($tipoObservacion == 3) {
+            $observacionString = "producto incorrecto";
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No existe tal opción de observación.'
+            ], 400);
+        }
+
+        $observacion = new Observacion();
+        $observacion->id_asignacion = $request->input('id_asignacion');
+        $observacion->id_distribuidor = $request->input('id_distribuidor');
+        $observacion->ubicacion_entrega = $request->input('ubicacion_entrega');
+        $observacion->hora_entrega = now()->format('H:i:s');
+        $observacion->observaciones = $observacionString;
+        $observacion->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Observación registrada exitosamente.',
+            'observacion' => $observacion
+        ], 201);
     }
 }

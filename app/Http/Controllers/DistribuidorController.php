@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Distribuidor;
 use App\Models\User;
+use App\Models\Vehiculo;
+use Illuminate\Support\Facades\Validator;
 
 class DistribuidorController extends Controller
 {
@@ -79,6 +81,86 @@ class DistribuidorController extends Controller
             return response()->json($distribuidor);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to update distribuidor', 'error' => $e->getMessage()], 500);
+        }
+    }
+    public function registrar(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nombre' => 'required|string',
+            'correo' => 'required|string',
+            'telefono' => 'required|string',
+            'password' => 'required|string',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user = User::create([
+            'name' => request()->input('nombre'),
+            'telefono' => request()->input('telefono'),
+            'email' => request()->input('correo'),
+            'rol' => 'distribuidor',
+            'password' => bcrypt(request()->input('password'))
+        ]);
+        $distribuidor = Distribuidor::create([
+            'estado_disponibilidad' => 'libre',
+            'id_usuario' => $user->id
+        ]);
+        $vehiculo = Vehiculo::create([
+            'id_distribuidor' => $distribuidor->id
+        ]);
+    }
+    public function registrarVehiculo(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'marca' => ['required', 'string'],
+            'modelo' => ['required', 'string'],
+            'placa' => ['required', 'string', 'unique:vehiculos,placa'],
+            'capacidad_carga' => ['required', 'numeric'],
+            'anio' => ['required', 'string'],
+            'id_distribuidor' => ['required', 'integer', 'exists:distribuidores,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Buscar el distribuidor por el id_usuario recibido como $id
+            $distribuidor = Distribuidor::where('id_usuario', $id)->first();
+
+            if (!$distribuidor) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Distribuidor no encontrado.'
+                ], 404);
+            }
+
+            // Buscar el vehículo asociado al distribuidor
+            $vehiculo = Vehiculo::where('id_distribuidor', $distribuidor->id)->first();
+
+            if (!$vehiculo) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Vehículo no encontrado para este distribuidor.'
+                ], 404);
+            }
+
+            // Actualizar el vehículo con los datos validados
+            $vehiculo->update($validator->validated());
+            return response()->json([
+                'status' => 'success',
+                'data' => $vehiculo
+            ], 201);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No se pudo registrar el vehículo.',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
         }
     }
 }
