@@ -35,11 +35,6 @@ class CompraController extends Controller
         $compra->save();
         $comprafinal = Compra::find($compra->id);
 
-        Asignacion::create([
-            'fecha_asignada' => now(),
-            'id_compra' => $compra->id
-        ]);
-
         return response()->json(['message' => 'Compra created successfully', 'compra' => $comprafinal], 201);
     }
     public function update(Request $request, $id)

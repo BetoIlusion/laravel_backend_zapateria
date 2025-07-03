@@ -27,7 +27,7 @@ class AsignacionController extends Controller
         //
     }
 
-
+    // ! FALTA ARREGLAR, EN INSERTAR LA ASIGNACION A LA BD
     public function insertar(Request $request): JsonResponse
     {
         $validator = validator($request->all(), [
@@ -47,7 +47,7 @@ class AsignacionController extends Controller
 
         $compra = Compra::find($idCompra);
         $distribuidor = Distribuidor::where('id', $idDistribuidor)
-            ->where('estado_disponibilidad', 'desocupado')
+            ->where('estado_disponibilidad', 'libre')
             ->first();
 
         if (!$compra || !$distribuidor) {
