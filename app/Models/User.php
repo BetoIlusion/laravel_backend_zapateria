@@ -33,7 +33,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'created_at',
+        'updated_at',
     ];
+  
 
     /**
      * The attributes that should be cast.
@@ -49,9 +52,12 @@ class User extends Authenticatable
         $this->save();
         return $this;
     }
-    public function productos()
+    public function ubicacion()
     {
-        return $this->hasMany(Producto::class, 'id_usuario');
+        return $this->hasOne(Ubicacion::class, 'id_usuario');
     }
-
+    public function distribuidor()
+    {
+        return $this->hasOne(Distribuidor::class, 'id_usuario');
+    }
 }

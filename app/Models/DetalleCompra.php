@@ -26,5 +26,13 @@ class DetalleCompra extends Model
         'created_at',
         'updated_at',
     ];
+    public function producto()
+    {
+        return $this->belongsTo(Producto::class, 'id_producto');
+    }
+    public function compra()
+    {
+        return $this->belongsTo(Compra::class, 'id_compra');    
+    }
     
 }

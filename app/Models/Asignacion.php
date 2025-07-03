@@ -9,13 +9,15 @@ class Asignacion extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'fecha_asignado',
+        'fecha_asignada',
         'id_usuario',
+        'id_distribuidor'
     ];
 
     protected $casts = [
         'fecha_asignado' => 'datetime',
         'id_usuario' => 'integer',
+        'id_distribuidor' => 'integer',
     ];
     protected $hidden = [
         'created_at',

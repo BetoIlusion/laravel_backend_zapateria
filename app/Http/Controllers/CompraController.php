@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asignacion;
 use Illuminate\Http\Request;
 use App\Models\Compra;
 use Illuminate\Support\Facades\Validator;
@@ -33,6 +34,11 @@ class CompraController extends Controller
         $compra->id_usuario = $user->id;
         $compra->save();
         $comprafinal = Compra::find($compra->id);
+
+        Asignacion::create([
+            'fecha_asignada' => now(),
+            'id_compra' => $compra->id
+        ]);
 
         return response()->json(['message' => 'Compra created successfully', 'compra' => $comprafinal], 201);
     }
@@ -115,6 +121,7 @@ class CompraController extends Controller
         $total = $detalles->sum('subtotal');
         $compra = Compra::find($id);
         $compra->total = $total;
+        $compra->volumen_total = $compra->volumenTotal();
         $compra->id_metodo_pago = $request->id_metodo_pago;
         $compra->save();
         return response()->json(['message' => 'Total calculado y guardado correctamente', 'total' => $compra]);

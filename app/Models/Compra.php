@@ -10,11 +10,13 @@ class Compra extends Model
     use HasFactory;
     protected $fillable = [
         'total',
+        'volumen_total',
         'id_usuario',
         'id_metodo_pago'
     ];
     protected $casts = [
         'total' => 'decimal:2',
+        'volumen_total' => 'decimal:2',
         'id_usuario' => 'integer',
         'id_metodo_pago' => 'integer'
     ];
@@ -22,12 +24,18 @@ class Compra extends Model
         'created_at',
         'updated_at',
     ];
-    public function pagos()
-    {
-        return $this->hasMany(Pago::class, 'id_compra');
-    }
+
     public function compra()
     {
         return $this->belongsTo(MetodoPago::class, 'id_metodo_pago');
+    }
+    public function volumenTotal()
+    {
+        return $this->hasMany(DetalleCompra::class, 'id_compra')
+            ->with('producto')
+            ->get()
+            ->sum(function ($detalle) {
+                return ($detalle->producto->volumen ?? 0) * $detalle->cantidad;
+            });
     }
 }

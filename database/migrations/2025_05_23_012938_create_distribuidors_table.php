@@ -13,10 +13,8 @@ return new class extends Migration
     {
         Schema::create('distribuidors', function (Blueprint $table) {
             $table->id();
-            $table->string('tipo_vehiculo');
             $table->string('estado_disponibilidad');
-            
-            $table->unsignedBigInteger('id_usuario');
+            $table->unsignedBigInteger('id_usuario');            
             $table->timestamps();
         });
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ubicacion;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -61,15 +62,12 @@ class Controller extends BaseController
             'name' => 'sometimes|required|string|max:255',
             'telefono' => 'sometimes|required|string',
             'email' => 'sometimes|required|string|email|max:255',
-
-            // 'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $id,
-            // 'password' => 'sometimes|required|string|min:8',
         ]);
         if ($Validator->fails()) {
             return response()->json($Validator->errors(), 422);
         }
         $user = User::find($id);
-        $user->fill($request->only(['name', 'telefono','email']));
+        $user->fill($request->only(['name', 'telefono', 'email']));
         $user->save();
         return response()->json($user);
     }
@@ -111,5 +109,50 @@ class Controller extends BaseController
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function updateUbicacion(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'latitud' => 'required|numeric',
+            'longitud' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+        $ubicacion = Ubicacion::where('id_usuario', $user->id)->first();
+        $ubicacion->latitud = $request->latitud;
+        $ubicacion->longitud = $request->longituda;
+        $ubicacion->save();
+        return response()->json(['message' => 'ubicacion actualizada', 'ubicacion' => $ubicacion]);
+    }
+    public function getUbicacion($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Usuario no autorizado o no encontrado.'
+            ], 403);
+        }
+
+        $ubicacion = Ubicacion::where('id_usuario', $id)->first();
+
+        if (!$ubicacion) {
+            return response()->json([
+                'status' => 'empty',
+                'message' => 'Ubicación no encontrada para este usuario.'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $ubicacion
+        ]);
     }
 }

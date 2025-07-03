@@ -5,29 +5,31 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Vehiculo extends Model
+class Observacion extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'marca',
-        'modelo',
-        'placa',
-        'capacidad_carga',
-        'anio',
+        'ubicacion_entrega',
+        'hora_entrega',
+        'observaciones',
+        'id_asignacion',
         'id_distribuidor'
     ];
     protected $casts = [
-        'marca' => 'string',
-        'modelo' => 'string',
-        'placa' => 'string',
-        'capacidad'=> 'float',
-        'anio' => 'string',
+        'ubicacion_entrega' => 'string',
+        'hora_entrega' => 'time',
+        'observaciones' => 'string',    
+        'id_asignacion' => 'integer',
         'id_distribuidor' => 'integer',
     ];
     protected $hidden = [
         'created_at',
         'updated_at',
     ];
+    public function asignacion()
+    {
+        return $this->belongsTo(Asignacion::class, 'id_asignacion');
+    }
     public function distribuidor()
     {
         return $this->belongsTo(Distribuidor::class, 'id_distribuidor');

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AsignacionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -33,6 +34,24 @@ Route::prefix('user')->group(function () {
     //actualizar usuario
     Route::put('/{id}', [Controller::class, 'update']);
 });
+// =============================================
+// @RUTAS DE UBICACION
+// =============================================
+//muestra la ubicacion de un id_usuario(no importa su rol)
+Route::get('ubicacion/{id}', [Controller::class, 'getUbicacion']);
+
+
+// =============================================
+// @RUTAS DE DISTRIBUIDOR
+// =============================================
+Route::prefix('distribuidor')->group(function () {
+    //muestra solo Usuarios distribuidores(con las ubicaciones y Distribuidor::class)
+    Route::get('/', [DistribuidorController::class, 'index']);
+    //obtener UN distribuidor, se inserta id_usuario 
+    //verificando que el id ingresado sea un distribuidor (tablas:usuario,distribuidor,ubicacion,vehiculo)
+    Route::get('/{id}', [DistribuidorController::class, 'show']);
+});
+
 
 // =============================================
 // @RUTAS DE PRODUCTO
@@ -58,23 +77,27 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/cliente', Controller::class);
 
 
+
     // =============================================
     // @RUTAS DE COMPRA
     // =============================================
-    // 1ero crear el registro 'compra' para despues añadir a los registro de detalle_compra sus id_compra
-    // ver como colocar el id_pago segun el enunciado del proyecto antes de crearlo
-    Route::patch('/compra', [CompraController::class, 'crear']);
-    // insertar Detalle de la compra(id_compra que generas) que es lo que estará registrado en el carrito(frontend)
-    Route::post('/compra/detalle', [CompraController::class, 'storeDetalle']);
-    // Luego usar este comando para sumar los subtotales en la compra e insertarlo en la compra creada, 
-    Route::put('/compra/{id}/total', [CompraController::class, 'calcularTotal']);
-    
+    Route::prefix('compra')->group(function () {
+        // 1ero crear el registro 'compra' para despues añadir a los registro de detalle_compra sus id_compra
+        // ver como colocar el id_pago segun el enunciado del proyecto antes de crearlo
+        Route::patch('/', [CompraController::class, 'crear']);
+        // insertar Detalle de la compra(id_compra que generas) que es lo que estará registrado en el carrito(frontend)
+        Route::post('/detalle', [CompraController::class, 'storeDetalle']);
+        // Luego usar este comando para sumar los subtotales en la compra e insertarlo en la compra creada, 
+        Route::put('/{id}/total', [CompraController::class, 'calcularTotal']);
+    });
 
+    // =============================================
+    // @RUTAS DE ASIGNACIONES
+    // =============================================
+    Route::post('/asignacion', [AsignacionController::class, 'insertar']);
+    // =============================================
+    // @RUTAS DE OBSERVACIONES
+    // =============================================
+    Route::post('/observacion',[AsignacionController::class,'insertarObservacion']);
 
-
-    // ---------------------------------------
-    // @RUTAS DE DISTRIBUIDORES
-    // ---------------------------------------
-    //CRUD
-    Route::resource('/distribuidor', DistribuidorController::class);
 });

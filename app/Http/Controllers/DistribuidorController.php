@@ -4,15 +4,30 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Distribuidor;
+use App\Models\User;
 
 class DistribuidorController extends Controller
 {
-    public function index(){
-        $user = auth()->user();
-        $distribuidores = Distribuidor::where('id_usuario', $user->id)->get();
-        return response()->json($distribuidores);
+    public function index()
+    {
+        $distribuidores = User::where('rol', 'distribuidor')
+            ->with(['ubicacion', 'distribuidor'])
+            ->get();
+
+        if ($distribuidores->isEmpty()) {
+            return response()->json([
+                'status' => 'empty',
+                'message' => 'No se encontraron distribuidores.'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $distribuidores
+        ]);
     }
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validatedData = $request->validate([
             'tipo_vehiculo' => 'required|string',
             'estado_disponibilidad' => 'required|string',
@@ -26,17 +41,26 @@ class DistribuidorController extends Controller
             return response()->json(['message' => 'Failed to create distribuidor', 'error' => $e->getMessage()], 500);
         }
     }
-    public function show($id) {
-        $user = auth()->user();
-        $distribuidor = Distribuidor::where('id_usuario', $user->id)->find($id);
-
-        if (!$distribuidor) {
+    public function show($id)
+    {
+        $user = User::find($id);
+        if (!$user || $user->rol !== 'distribuidor') {
+            return response()->json(['message' => 'Distribuidor not found'], 404);
+        }
+        // Obtener el usuario completo con relaciones
+        $userCompleto = User::with([
+            'distribuidor',
+            'distribuidor.vehiculo',
+            'ubicacion'
+        ])->find($id);
+        if (!$userCompleto) {
             return response()->json(['message' => 'Distribuidor not found'], 404);
         }
 
-        return response()->json($distribuidor);
+        return response()->json($userCompleto);
     }
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         $user = auth()->user();
         $distribuidor = Distribuidor::where('id_usuario', $user->id)->find($id);
 

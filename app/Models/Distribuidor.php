@@ -9,12 +9,10 @@ class Distribuidor extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'tipo_vehiculo',
         'estado_disponibilidad',
         'id_usuario'
     ];
     protected $casts = [
-        'tipo_vehiculo' => 'string',
         'estado_disponibilidad' => 'string',
         'id_usuario' => 'integer',
     ];
