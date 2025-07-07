@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('volumen');
             $table->integer('stock');
             $table->text('descripcion');
+            $table->string('imagen')->nullable();
             $table->unsignedBigInteger('id_tipo');
             //$table->foreign('id_usuario')->references('id')->on('users');
             $table->timestamps();

@@ -25,4 +25,15 @@ class Distribuidor extends Model
         return $this->hasOne(Vehiculo::class, 'id_distribuidor');
     }
 
+    public function getDistribuidores()
+    {
+        $distribuidores = User::where('rol', 'distribuidor')
+            ->with(['ubicacion', 'distribuidor'])
+            ->get();
+        return $distribuidores;
+    }
+    public function volumenVehiculo(){
+        return $this->vehiculo->capacidad_carga ?? null;
+    }
+
 }

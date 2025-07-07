@@ -12,9 +12,8 @@ class DistribuidorController extends Controller
 {
     public function index()
     {
-        $distribuidores = User::where('rol', 'distribuidor')
-            ->with(['ubicacion', 'distribuidor'])
-            ->get();
+        $distribuidores = new Distribuidor();
+        $distribuidores = $distribuidores->getDistribuidores();
 
         if ($distribuidores->isEmpty()) {
             return response()->json([

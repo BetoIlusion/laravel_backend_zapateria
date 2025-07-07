@@ -90,7 +90,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::patch('/', [CompraController::class, 'crear']);
         // insertar Detalle de la compra(id_compra que generas) que es lo que estará registrado en el carrito(frontend)
         Route::post('/detalle', [CompraController::class, 'storeDetalle']);
-        // Luego usar este comando para sumar los subtotales en la compra e insertarlo en la compra creada, 
+        // [id_compra] Luego usar este comando para sumar los subtotales en la compra e insertarlo en la compra creada, 
         Route::put('/{id}/total', [CompraController::class, 'calcularTotal']);
     });
 
@@ -100,6 +100,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     //INSERTAR datos requeridos, este procesará con las condiciones establecidas
     //de comparacion de volumenes de entrega Compra-Distribuidor
     Route::post('/asignacion', [AsignacionController::class, 'insertar']);
+    //MOSTRAR -> id, fecha asignada, distancia,
     // =============================================
     // @RUTAS DE OBSERVACIONES
     // =============================================

@@ -14,11 +14,14 @@ class Producto extends Model
         'volumen',
         'stock',
         'descripcion',
+        'imagen',
         'id_tipo'
     ];
     protected $casts = [
         'precio' => 'decimal:2',
         'stock' => 'integer',
+        'imagen' => 'string',
+
     ];
     protected $hidden = [
         'created_at',

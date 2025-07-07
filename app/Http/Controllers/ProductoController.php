@@ -6,13 +6,33 @@ use Illuminate\Http\Request;
 use App\Models\Producto;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class ProductoController extends Controller
 {
     public function index()
     {
         $productos = Producto::all();
-        return response()->json($productos);
+
+        $data = $productos->map(function ($producto) {
+            return [
+                'id' => $producto->id,
+                'nombre' => $producto->nombre,
+                'descripcion' => $producto->descripcion,
+                'precio' => $producto->precio,
+                'stock' => $producto->stock,
+                'volumen' => $producto->volumen,
+                'id_tipo' => $producto->id_tipo,
+                'imagen_url' => $producto->imagen
+                    ? asset('storage/' . $producto->imagen)
+                    : null,
+            ];
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ]);
     }
 
     public function show($id)
@@ -30,6 +50,7 @@ class ProductoController extends Controller
         return response()->json($producto);
     }
 
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -37,23 +58,31 @@ class ProductoController extends Controller
             'descripcion' => 'nullable|string',
             'precio' => 'required|numeric',
             'stock' => 'required|integer',
+            'id_tipo' => 'required|exists:tipo_productos,id',
+            'imagen' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
 
-        $validatedData = $validator->validated();
+        $data = $validator->validated();
 
-        $producto = Producto::create([
-            'nombre' => $validatedData['nombre'],
-            'descripcion' => $validatedData['descripcion'],
-            'precio' => $validatedData['precio'],
-            'stock' => $validatedData['stock'],
-            'id_usuario' => auth()->id(),
-        ]);
+        if ($request->hasFile('imagen')) {
+            $imagen = $request->file('imagen');
+            $ruta = $imagen->store('imagenes_productos', 'public'); // almacena en /storage/app/public/imagenes_productos
+            $data['imagen'] = $ruta;
+        }
 
-        return response()->json($producto, 201);
+        $data['id_usuario'] = auth()->id();
+
+        $producto = Producto::create($data);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $producto,
+            'url_imagen' => $producto->imagen ? asset('storage/' . $producto->imagen) : null
+        ], 201);
     }
 
     public function update(Request $request, $id)

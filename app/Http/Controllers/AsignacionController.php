@@ -32,7 +32,6 @@ class AsignacionController extends Controller
     {
         $validator = validator($request->all(), [
             'id_compra' => ['required', 'exists:compras,id'],
-            'id_distribuidor' => ['required', 'exists:distribuidores,id'],
         ]);
 
         if ($validator->fails()) {
@@ -42,36 +41,11 @@ class AsignacionController extends Controller
             ], 422);
         }
 
-        $idCompra = $request->input('id_compra');
-        $idDistribuidor = $request->input('id_distribuidor');
-
-        $compra = Compra::find($idCompra);
-        $distribuidor = Distribuidor::where('id', $idDistribuidor)
-            ->where('estado_disponibilidad', 'libre')
-            ->first();
-
-        if (!$compra || !$distribuidor) {
-            return response()->json([
-                'status' => 'false',
-                'message' => 'Distribuidor desocupado o compra no disponible'
-            ], 200);
-        }
-
-        // Obtener vehículo por id_usuario (relación con Distribuidor)
-        $vehiculo = Vehiculo::where('id_distribuidor', $distribuidor->id)->first();
-
-        if (!$vehiculo) {
-            return response()->json([
-                'status' => 'false',
-                'message' => 'Vehículo no encontrado para el distribuidor.'
-            ], 200);
-        }
-
-        $volumenCompra = $compra->volumen_total;
-        $capacidadVehiculo = $vehiculo->capacidad_carga;
-
-        $resultado = $volumenCompra <= $capacidadVehiculo;
-
+        $asignacion = New Asignacion();
+        $asignacion->id_compra = request()->input('id_compra');
+        $resultado = $asignacion->asignarDistribuidor();
+         
+        
         return response()->json([
             'status' => $resultado
         ]);

@@ -20,7 +20,7 @@ class Vehiculo extends Model
         'marca' => 'string',
         'modelo' => 'string',
         'placa' => 'string',
-        'capacidad'=> 'float',
+        'capacidad_carga'=> 'float',
         'anio' => 'string',
         'id_distribuidor' => 'integer',
     ];
