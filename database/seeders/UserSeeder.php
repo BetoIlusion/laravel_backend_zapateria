@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
             'password' => bcrypt('123456789')
         ]);
         Ubicacion::create([
-            'latitud' => 17.7622,
+            'latitud' => -17.7622,
             'longitud' => -63.1657,
             'id_usuario' => $user->id
         ]);

@@ -35,6 +35,10 @@ class CompraController extends Controller
         $compra->save();
         $comprafinal = Compra::find($compra->id);
 
+        $asignacion = new Asignacion();
+        $asignacion->id_compra = $compra->id;
+        $a = $asignacion->asignarDistribuidor();
+
         return response()->json(['message' => 'Compra created successfully', 'compra' => $comprafinal], 201);
     }
     public function update(Request $request, $id)
@@ -98,7 +102,7 @@ class CompraController extends Controller
 
     public function calcularTotal(Request $request, $id)
     {
-         $validator = Validator::make(
+        $validator = Validator::make(
             $request->all(),
             [
                 'id_metodo_pago' => 'required|integer|exists:metodo_pagos,id'
@@ -120,5 +124,48 @@ class CompraController extends Controller
         $compra->id_metodo_pago = $request->id_metodo_pago;
         $compra->save();
         return response()->json(['message' => 'Total calculado y guardado correctamente', 'total' => $compra]);
+    }
+
+    public function getCompras($filtro)
+    {
+        if (!auth()->check()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No autorizado'
+            ], 403);
+        }
+
+        $estados = [
+            1 => 'en curso',
+            2 => 'entregado',
+            3 => 'no entregado',
+            4 => 'producto incorrecto'
+        ];
+
+        $estado = $estados[$filtro] ?? null;
+        if (!$estado) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Filtro inválido'
+            ], 400);
+        }
+
+        $compras = Compra::where('id_usuario', auth()->id())
+            ->whereHas('asignacion', function ($query) use ($estado) {
+                $query->where('estado', $estado);
+            })
+            ->get();
+
+        if ($compras->isEmpty()) {
+            return response()->json([
+                'status' => 'empty',
+                'message' => 'No se encontraron compras registradas'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $compras
+        ]);
     }
 }

@@ -21,13 +21,20 @@ class Compra extends Model
         'id_metodo_pago' => 'integer'
     ];
     protected $hidden = [
-        'created_at',
         'updated_at',
     ];
 
     public function compra()
     {
         return $this->belongsTo(MetodoPago::class, 'id_metodo_pago');
+    }
+    public function asignacion()
+    {
+        return $this->hasOne(Asignacion::class, 'id_compra');
+    }
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'id_usuario');
     }
     public function volumenTotal()
     {

@@ -48,4 +48,32 @@ class Ubicacion extends Model
             return $ubicacion;
         };
     }
+
+    public static function getUbicacionesRuta($id_compra, $id_distribuidor)
+    {
+        $compra = Compra::with('usuario')->find($id_compra);
+        $distribuidor = Distribuidor::with('usuario')->find($id_distribuidor);
+
+        if (!$compra || !$distribuidor) {
+            return null;
+        }
+
+        $ubicacionCliente = self::where('id_usuario', $compra->id_usuario)->first();
+        $ubicacionDistribuidor = self::where('id_usuario', $distribuidor->id_usuario)->first();
+
+        return [
+            'cliente' => [
+                'id_compra' => $id_compra,
+                'nombre' => optional($compra->usuario)->name,
+                'latitud' => optional($ubicacionCliente)->latitud,
+                'longitud' => optional($ubicacionCliente)->longitud,
+            ],
+            'distribuidor' => [
+                'id_distribuidor' => $id_distribuidor,
+                'nombre' => optional($distribuidor->usuario)->name,
+                'latitud' => optional($ubicacionDistribuidor)->latitud,
+                'longitud' => optional($ubicacionDistribuidor)->longitud,
+            ]
+        ];
+    }
 }

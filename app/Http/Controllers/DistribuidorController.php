@@ -162,4 +162,31 @@ class DistribuidorController extends Controller
             ], 500);
         }
     }
+
+    public function cambiarEstado()
+    {
+        $user = auth()->user();
+        $dis = Distribuidor::where('id_usuario', $user->id)->firstOrFail();
+
+        $dis->estado_disponibilidad = ($dis->estado_disponibilidad === 'libre')
+            ? 'no libre' : 'libre';
+
+        $dis->save();
+
+        return response()->json([
+            'status' => 'success',
+            'estado' => $dis->estado_disponibilidad
+        ]);
+    }
+
+    public function obtenerEstado()
+    {
+        $user = auth()->user();
+        $dis = Distribuidor::where('id_usuario', $user->id)->firstOrFail();
+
+        return response()->json([
+            'status' => 'success',
+            'estado' => $dis->estado_disponibilidad
+        ]);
+    }
 }

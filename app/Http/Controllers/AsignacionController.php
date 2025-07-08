@@ -15,11 +15,7 @@ use App\Models\Vehiculo;
 
 class AsignacionController extends Controller
 {
-    public function index()
-    {
-        $user = auth()->user();
-        return response()->json(['message' => 'Asignaciones', 'user' => $user]);
-    }
+    public function index() {}
 
 
     public function create()
@@ -27,7 +23,6 @@ class AsignacionController extends Controller
         //
     }
 
-    // ! FALTA ARREGLAR, EN INSERTAR LA ASIGNACION A LA BD
     public function insertar(Request $request): JsonResponse
     {
         $validator = validator($request->all(), [
@@ -41,11 +36,11 @@ class AsignacionController extends Controller
             ], 422);
         }
 
-        $asignacion = New Asignacion();
+        $asignacion = new Asignacion();
         $asignacion->id_compra = request()->input('id_compra');
         $resultado = $asignacion->asignarDistribuidor();
-         
-        
+
+
         return response()->json([
             'status' => $resultado
         ]);
@@ -143,5 +138,32 @@ class AsignacionController extends Controller
             'message' => 'Observación registrada exitosamente.',
             'observacion' => $observacion
         ], 201);
+    }
+    public function mostrar()
+    {
+        if (!auth()->check()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No autorizado'
+            ], 403);
+        }
+
+        $distribuidor = Distribuidor::where('id_usuario', auth()->id())->first();
+        if (!$distribuidor) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Distribuidor no encontrado'
+            ], 404);
+        }
+
+        $asignacion = new Asignacion();
+        $asignacion->id_distribuidor = $distribuidor->id;
+
+        $detalles = $asignacion->asignacionDetalle();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $detalles
+        ]);
     }
 }

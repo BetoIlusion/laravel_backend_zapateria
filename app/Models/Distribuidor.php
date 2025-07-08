@@ -20,6 +20,11 @@ class Distribuidor extends Model
         'created_at',
         'updated_at',
     ];
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'id_usuario');
+    }
+
     public function vehiculo()
     {
         return $this->hasOne(Vehiculo::class, 'id_distribuidor');
@@ -29,11 +34,13 @@ class Distribuidor extends Model
     {
         $distribuidores = User::where('rol', 'distribuidor')
             ->with(['ubicacion', 'distribuidor'])
+            ->with('estado_disponibilidad', 'libre')
             ->get();
         return $distribuidores;
     }
-    public function volumenVehiculo(){
-        return $this->vehiculo->capacidad_carga ?? null;
-    }
+    public function volumenVehiculo()
+    {
 
+        return $this->vehiculo->capacidad_carga ?? 0;
+    }
 }

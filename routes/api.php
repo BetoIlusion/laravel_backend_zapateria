@@ -36,6 +36,8 @@ Route::prefix('user')->group(function () {
 // =============================================
 //muestra la ubicacion de un id_usuario(no importa su rol)
 Route::get('ubicacion/{id}', [Controller::class, 'getUbicacion']);
+Route::post('/ubicacion/ruta', [Controller::class, 'getUbicacionesRuta']);
+Route::post('/ubicacion',[Controller::class, 'updateUbicacion']);
 
 
 // =============================================
@@ -49,11 +51,13 @@ Route::prefix('distribuidor')->group(function () {
     Route::get('/{id}', [DistribuidorController::class, 'show']);
     //Las 2 rutas son necesarias para registrar por completo un nuevo distribuidor
     //Registrar DISTRIBUIDOR(crea el distribuidor por completo)
-    Route::post('/',[DistribuidorController::class,'registrar']);
+    Route::post('/', [DistribuidorController::class, 'registrar']);
     //Insertar id_usuario(NO distribuidor->id). Actualiza vehiculo del Distribuidor 
-    Route::put('/{id}/vehiculo',[DistribuidorController::class, 'registrarVehiculo']);
+    Route::put('/{id}/vehiculo', [DistribuidorController::class, 'registrarVehiculo']);
+    //cambia estado LIBRE/NO LIBRE
 
 });
+
 
 
 // =============================================
@@ -92,19 +96,25 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/detalle', [CompraController::class, 'storeDetalle']);
         // [id_compra] Luego usar este comando para sumar los subtotales en la compra e insertarlo en la compra creada, 
         Route::put('/{id}/total', [CompraController::class, 'calcularTotal']);
+
+        Route::get('/{filtro}', [CompraController::class, 'getCompras']);
     });
 
     // =============================================
     // @RUTAS DE ASIGNACIONES
     // =============================================
-    //INSERTAR datos requeridos, este procesará con las condiciones establecidas
-    //de comparacion de volumenes de entrega Compra-Distribuidor
-    Route::post('/asignacion', [AsignacionController::class, 'insertar']);
+    // //INSERTAR datos requeridos, este procesará con las condiciones establecidas
+    // //de comparacion de volumenes de entrega Compra-Distribuidor
+    // Route::post('/asignacion', [AsignacionController::class, 'insertar']);
+    Route::get('/asignacion', [AsignacionController::class, 'mostrar']);
+
+    Route::patch('/distribuidor/estado', [DistribuidorController::class, 'cambiarEstado']);
+    Route::get('/distribuidor/estado', [DistribuidorController::class, 'obtenerEstado']);
+
     //MOSTRAR -> id, fecha asignada, distancia,
     // =============================================
     // @RUTAS DE OBSERVACIONES
     // =============================================
     // el distribuidor verá que ingresar en las observaciones
-    Route::post('/observacion',[AsignacionController::class,'insertarObservacion']);
-
+    Route::post('/observacion', [AsignacionController::class, 'insertarObservacion']);
 });

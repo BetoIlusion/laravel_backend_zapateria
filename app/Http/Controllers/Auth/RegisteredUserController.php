@@ -10,6 +10,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use App\Models\Ubicacion;
+use App\Models\Distribuidor;
 
 class RegisteredUserController extends Controller
 {
@@ -24,13 +26,27 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'rol' => ['required']
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'rol' => $request->rol
         ]);
+        
+        Ubicacion::create([
+            'id_usuario' => $user->id,
+            'latitud' => -17.783327,   // Coordenada aproximada
+            'longitud' => -63.182140   // Coordenada aproximada
+        ]);
+
+        if ($request->rol == 'distribuidor') {
+            Distribuidor::create([
+                'id_usuario' => $user->id
+            ]);
+        }
 
         event(new Registered($user));
 

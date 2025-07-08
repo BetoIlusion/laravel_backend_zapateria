@@ -111,7 +111,7 @@ class Controller extends BaseController
         }
     }
 
-    public function updateUbicacion(Request $request, $id)
+    public function updateUbicacion(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'latitud' => 'required|numeric',
@@ -154,5 +154,67 @@ class Controller extends BaseController
             'status' => 'success',
             'data' => $ubicacion
         ]);
+    }
+    public function getUbicacionesRuta(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id_compra' => 'required|integer|exists:compras,id',
+            'id_distribuidor' => 'required|integer|exists:distribuidors,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $resultado = Ubicacion::getUbicacionesRuta(
+            $request->input('id_compra'),
+            $request->input('id_distribuidor')
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $resultado
+        ]);
+    }
+    public function register(Request $request)
+    {
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|confirmed|min:6',
+                'rol' => 'required|in:cliente,distribuidor,admin',
+            ]);
+
+            $user = User::create([
+                'name' => $request->nombre,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'rol' => $request->rol,
+            ]);
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'user' => $user,
+                'token' => $token,
+                'rol' => $user->rol,
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during registration.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

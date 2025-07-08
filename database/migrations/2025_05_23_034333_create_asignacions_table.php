@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('asignacions', function (Blueprint $table) {
             $table->id();
             $table->date('fecha_asignada');
+            $table->decimal('distancia');
+            $table->decimal('tiempo');
+            $table->string('estado')->default('en curso');
             $table->unsignedBigInteger('id_compra');
             $table->unsignedBigInteger('id_distribuidor');
             $table->timestamps();
