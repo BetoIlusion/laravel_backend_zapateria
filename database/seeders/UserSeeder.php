@@ -74,7 +74,7 @@ class UserSeeder extends Seeder
             'marca' => 'nissan',
             'modelo' => 'np300',
             'placa' => '456DEF',
-            'capacidad_carga' => '15.5',
+            'capacidad_carga' => '40',
             'anio' => '2015',
             'id_distribuidor' => $distribuidor->id
         ]);
