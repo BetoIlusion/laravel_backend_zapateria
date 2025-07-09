@@ -166,4 +166,43 @@ class AsignacionController extends Controller
             'data' => $detalles
         ]);
     }
+    public function cambiarEstado($id, $estado)
+{
+    $user = auth()->user();
+    if (!$user) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'No autorizado'
+        ], 403);
+    }
+
+    $asignacion = Asignacion::find($id);
+    if (!$asignacion) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Asignación no encontrada'
+        ], 404);
+    }
+
+    $estadosValidos = ['en curso', 'entregado', 'no entregado', 'producto incorrecto'];
+    if (!in_array($estado, $estadosValidos)) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Estado inválido'
+        ], 422);
+    }
+
+    $asignacion->estado = $estado;
+    $asignacion->updated_at = now();
+    $asignacion->save();
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Estado actualizado exitosamente',
+        'data' => [
+            'id' => $asignacion->id,
+            'estado' => $asignacion->estado,
+        ]
+    ], 200);
+}
 }

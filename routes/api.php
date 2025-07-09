@@ -88,6 +88,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/vehiculo', [DistribuidorController::class, 'getVehiculo']);
     Route::post('/vehiculo', [DistribuidorController::class, 'updateVehiculo']);
 
+    Route::get('/asignacion/{id}/estado/{estado}', [AsignacionController::class, 'cambiarEstado']);
 
 
 

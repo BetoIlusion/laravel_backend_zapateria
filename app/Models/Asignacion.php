@@ -159,6 +159,7 @@ class Asignacion extends Model
 
         return $asignaciones->map(function ($a) {
             return [
+                'id' => $a->id,
                 'id_compra' => $a->id_compra,
                 'id_distribuidor' => $a->id_distribuidor,
                 'fecha_asignada' => $a->fecha_asignada,
