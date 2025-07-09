@@ -9,6 +9,7 @@ use App\Http\Controllers\CompraController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\DistribuidorController;
 use App\Http\Controllers\ProductoController;
+use App\Models\Distribuidor;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,7 @@ Route::prefix('user')->group(function () {
     Route::post('/register', [RegisteredUserController::class, 'store']);
     //actualizar usuario
     Route::put('/{id}', [Controller::class, 'update']);
+    Route::get('/', [Controller::class, 'getUser']);
 });
 // =============================================
 // @RUTAS DE UBICACION
@@ -37,7 +39,6 @@ Route::prefix('user')->group(function () {
 //muestra la ubicacion de un id_usuario(no importa su rol)
 Route::get('ubicacion/{id}', [Controller::class, 'getUbicacion']);
 Route::post('/ubicacion/ruta', [Controller::class, 'getUbicacionesRuta']);
-Route::post('/ubicacion',[Controller::class, 'updateUbicacion']);
 
 
 // =============================================
@@ -54,8 +55,6 @@ Route::prefix('distribuidor')->group(function () {
     Route::post('/', [DistribuidorController::class, 'registrar']);
     //Insertar id_usuario(NO distribuidor->id). Actualiza vehiculo del Distribuidor 
     Route::put('/{id}/vehiculo', [DistribuidorController::class, 'registrarVehiculo']);
-    //cambia estado LIBRE/NO LIBRE
-
 });
 
 
@@ -82,6 +81,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // ---------------------------------------
     //CRUD
     Route::resource('/cliente', Controller::class);
+
+    Route::post('/ubicacion', [Controller::class, 'updateUbicacion']);
+
+
+    Route::get('/vehiculo', [DistribuidorController::class, 'getVehiculo']);
+    Route::post('/vehiculo', [DistribuidorController::class, 'updateVehiculo']);
+
 
 
 

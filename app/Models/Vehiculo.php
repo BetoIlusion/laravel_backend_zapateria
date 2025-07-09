@@ -32,4 +32,9 @@ class Vehiculo extends Model
     {
         return $this->belongsTo(Distribuidor::class, 'id_distribuidor');
     }
+    public static function crearVehiculo($id_distribuidori){
+        return self::create([
+            'id_distribuidor' => $id_distribuidori
+        ]);
+    }
 }

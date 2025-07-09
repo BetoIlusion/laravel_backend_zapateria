@@ -189,4 +189,84 @@ class DistribuidorController extends Controller
             'estado' => $dis->estado_disponibilidad
         ]);
     }
+    public function getVehiculo()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No autorizado'
+            ], 403);
+        }
+
+        $distribuidor = Distribuidor::where('id_usuario', $user->id)->first();
+        if (!$distribuidor) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Distribuidor no encontrado'
+            ], 404);
+        }
+
+        $vehiculo = Vehiculo::where('id_distribuidor', $distribuidor->id)->first();
+        return response()->json([
+            'status' => 'success',
+            'data' => $vehiculo ?: null // Devuelve null si no hay vehículo
+        ], 200);
+    }
+
+    public function updateVehiculo(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No autorizado'
+            ], 403);
+        }
+
+        $distribuidor = Distribuidor::where('id_usuario', $user->id)->first();
+        if (!$distribuidor) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Distribuidor no encontrado'
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'marca' => 'required|string|max:255',
+            'modelo' => 'required|string|max:255',
+            'placa' => 'required|string|max:50',
+            'capacidad_carga' => 'required|numeric|min:0',
+            'anio' => 'required|string|size:4',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        $vehiculo = Vehiculo::where('id_distribuidor', $distribuidor->id)->first();
+        $data = [
+            'marca' => $request->marca,
+            'modelo' => $request->modelo,
+            'placa' => $request->placa,
+            'capacidad_carga' => $request->capacidad_carga,
+            'anio' => $request->anio,
+            'id_distribuidor' => $distribuidor->id,
+        ];
+
+        if ($vehiculo) {
+            $vehiculo->update($data);
+        } else {
+            $vehiculo = Vehiculo::create($data);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Vehículo actualizado exitosamente',
+            'vehiculo' => $vehiculo
+        ], 200);
+    }
 }

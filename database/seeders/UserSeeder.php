@@ -79,56 +79,56 @@ class UserSeeder extends Seeder
             'id_distribuidor' => $distribuidor->id
         ]);
 
-        $user = User::factory()->create([
-            'name' => 'dist 3',
-            'telefono' => '7989384',
-            'email' => 'dist3@gmail.com',
-            'rol' => 'distribuidor',
-            'password' => bcrypt('123456789')
-        ]);
-        Ubicacion::create([
-            'latitud' => -17.7603,
-            'longitud' => -63.1602,
-            'id_usuario' => $user->id
-        ]);
-        $distribuidor = Distribuidor::create([
-            'estado_disponibilidad' => 'libre',
-            'id_usuario' => $user->id
-        ]);
+        // $user = User::factory()->create([
+        //     'name' => 'dist 3',
+        //     'telefono' => '7989384',
+        //     'email' => 'dist3@gmail.com',
+        //     'rol' => 'distribuidor',
+        //     'password' => bcrypt('123456789')
+        // ]);
+        // Ubicacion::create([
+        //     'latitud' => -17.7603,
+        //     'longitud' => -63.1602,
+        //     'id_usuario' => $user->id
+        // ]);
+        // $distribuidor = Distribuidor::create([
+        //     'estado_disponibilidad' => 'libre',
+        //     'id_usuario' => $user->id
+        // ]);
         
-        Vehiculo::create([
-            'marca' => 'ford',
-            'modelo' => 'f150',
-            'placa' => '789GHI',
-            'capacidad_carga' => '18.0',
-            'anio' => '2010',
-            'id_distribuidor' => $distribuidor->id
-        ]);
+        // Vehiculo::create([
+        //     'marca' => 'ford',
+        //     'modelo' => 'f150',
+        //     'placa' => '789GHI',
+        //     'capacidad_carga' => '18.0',
+        //     'anio' => '2010',
+        //     'id_distribuidor' => $distribuidor->id
+        // ]);
 
-        $user = User::factory()->create([
-            'name' => 'dist 4',
-            'telefono' => '7989384',
-            'email' => 'dist4@gmail.com',
-            'rol' => 'distribuidor',
-            'password' => bcrypt('123456789')
-        ]);
-        Ubicacion::create([
-            'latitud' => -17.7557,
-            'longitud' => -63.1755,
-            'id_usuario' => $user->id
-        ]);
-        $distribuidor = Distribuidor::create([
-            'estado_disponibilidad' => 'libre',
-            'id_usuario' => $user->id
-        ]);
+        // $user = User::factory()->create([
+        //     'name' => 'dist 4',
+        //     'telefono' => '7989384',
+        //     'email' => 'dist4@gmail.com',
+        //     'rol' => 'distribuidor',
+        //     'password' => bcrypt('123456789')
+        // ]);
+        // Ubicacion::create([
+        //     'latitud' => -17.7557,
+        //     'longitud' => -63.1755,
+        //     'id_usuario' => $user->id
+        // ]);
+        // $distribuidor = Distribuidor::create([
+        //     'estado_disponibilidad' => 'libre',
+        //     'id_usuario' => $user->id
+        // ]);
         
-        Vehiculo::create([
-            'marca' => 'chevrolet',
-            'modelo' => 'silverado',
-            'placa' => '321ZYX',
-            'capacidad_carga' => '22.5',
-            'anio' => '2018',
-            'id_distribuidor' => $distribuidor->id
-        ]);
+        // Vehiculo::create([
+        //     'marca' => 'chevrolet',
+        //     'modelo' => 'silverado',
+        //     'placa' => '321ZYX',
+        //     'capacidad_carga' => '22.5',
+        //     'anio' => '2018',
+        //     'id_distribuidor' => $distribuidor->id
+        // ]);
     }
 }

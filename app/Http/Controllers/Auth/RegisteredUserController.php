@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use App\Models\Ubicacion;
 use App\Models\Distribuidor;
+use App\Models\Vehiculo;
 
 class RegisteredUserController extends Controller
 {
@@ -35,7 +36,7 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             'rol' => $request->rol
         ]);
-        
+
         Ubicacion::create([
             'id_usuario' => $user->id,
             'latitud' => -17.783327,   // Coordenada aproximada
@@ -43,9 +44,8 @@ class RegisteredUserController extends Controller
         ]);
 
         if ($request->rol == 'distribuidor') {
-            Distribuidor::create([
-                'id_usuario' => $user->id
-            ]);
+           $r = Distribuidor::crearDistribuidor($user->id);
+           Vehiculo::crearVehiculo($r->id);
         }
 
         event(new Registered($user));

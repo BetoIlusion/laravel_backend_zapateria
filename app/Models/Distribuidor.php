@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Distribuidor extends Model
 {
     use HasFactory;
+    protected $table = 'distribuidors';
     protected $fillable = [
         'estado_disponibilidad',
         'id_usuario'
@@ -32,15 +33,23 @@ class Distribuidor extends Model
 
     public function getDistribuidores()
     {
-        $distribuidores = User::where('rol', 'distribuidor')
+        return User::where('rol', 'distribuidor')
+            ->whereHas('distribuidor', function ($query) {
+                $query->where('estado_disponibilidad', 'libre');
+            })
             ->with(['ubicacion', 'distribuidor'])
-            ->with('estado_disponibilidad', 'libre')
             ->get();
-        return $distribuidores;
     }
+
     public function volumenVehiculo()
     {
 
         return $this->vehiculo->capacidad_carga ?? 0;
+    }
+    public static function crearDistribuidor($id_usuario){
+        return self::create([
+            'estado_disponibilidad' => 'libre',
+            'id_usuario' => $id_usuario
+        ]);
     }
 }

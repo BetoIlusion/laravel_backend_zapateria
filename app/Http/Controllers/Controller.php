@@ -126,7 +126,7 @@ class Controller extends BaseController
         }
         $ubicacion = Ubicacion::where('id_usuario', $user->id)->first();
         $ubicacion->latitud = $request->latitud;
-        $ubicacion->longitud = $request->longituda;
+        $ubicacion->longitud = $request->longitud;
         $ubicacion->save();
         return response()->json(['message' => 'ubicacion actualizada', 'ubicacion' => $ubicacion]);
     }
@@ -216,5 +216,27 @@ class Controller extends BaseController
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+    public function getUser()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No autorizado'
+            ], 403);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'telefono' => $user->telefono,
+                'email' => $user->email,
+                'rol' => $user->rol,
+                'email_verified_at' => $user->email_verified_at,
+            ]
+        ], 200);
     }
 }
