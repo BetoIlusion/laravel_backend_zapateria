@@ -18,8 +18,9 @@ COPY . .
 # Instalar dependencias de Laravel
 RUN composer install --no-dev --optimize-autoloader
 
-# Ejecutar comandos de Laravel
-RUN php artisan key:generate && \
+# Crear un archivo .env vacío y ejecutar comandos
+RUN touch .env && \
+    php artisan key:generate && \
     php artisan migrate --force && \
     php artisan db:seed --force
 
