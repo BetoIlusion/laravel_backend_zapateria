@@ -19,19 +19,17 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # Crea un archivo .env vacío (necesario para ejecutar comandos de Laravel)
-# Asigna permisos a los directorios requeridos y ejecuta los comandos necesarios:
-# - key:generate -> genera la clave de aplicación
-# - migrate -> ejecuta las migraciones
-# - db:seed -> ejecuta los seeders para poblar la base de datos
+# Asigna permisos a los directorios requeridos y genera la key de aplicación
 RUN touch .env && \
     chmod -R 775 storage bootstrap/cache && \
-    php artisan key:generate && \
-    php artisan migrate --force && \
-    php artisan db:seed --force
+    php artisan key:generate
+
+# realizar comandos (en local) de forma manual después del despliegue usando las mismas variables del .env de producccion :
+# php artisan migrate --force
+# php artisan db:seed --force
 
 # Expone el puerto 8000 para que Render pueda acceder a la app
 EXPOSE 8000
 
 # Comando que inicia el servidor Laravel cuando el contenedor arranca
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
-
