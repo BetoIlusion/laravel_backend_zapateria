@@ -17,12 +17,14 @@ COPY . .
 # Instalar dependencias de Laravel
 RUN composer install --no-dev --optimize-autoloader
 
-# Crear archivo .env si no existe y generar key
-RUN if [ ! -f .env ]; then cp .env.example .env; fi
-RUN php artisan key:generate
-
-# Asignar permisos necesarios
+# Dar permisos correctos
 RUN chmod -R 775 storage bootstrap/cache
+
+# Puerto expuesto
+EXPOSE 8000
+
+# Comando para iniciar el servidor Laravel
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
 
 # Exponer el puerto
 EXPOSE 8000
