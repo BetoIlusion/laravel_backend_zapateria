@@ -155,6 +155,29 @@ class Controller extends BaseController
             'data' => $ubicacion
         ]);
     }
+    public function getUbicacionMia()
+    {
+
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Usuario no autorizado o no encontrado.'
+            ], 403);
+        }
+        $ubicacion = Ubicacion::where('id_usuario', $user->id)->first();
+        if (!$ubicacion) {
+            return response()->json([
+                'status' => 'empty',
+                'message' => 'Ubicación no encontrada para este usuario.'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $ubicacion
+        ]);
+    }
     public function getUbicacionesRuta(Request $request)
     {
         $validator = Validator::make($request->all(), [

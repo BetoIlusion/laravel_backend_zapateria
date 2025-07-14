@@ -171,4 +171,23 @@ class Asignacion extends Model
             ];
         });
     }
+    public static function asignacionUbicacion($id_user)
+    {
+        $distribuidor = Distribuidor::where('id_usuario', $id_user)->first();
+
+        $asignaciones = Asignacion::where('id_distribuidor', $distribuidor->id)
+            ->with('compra.usuario.ubicacion')
+            ->get();
+
+        $resultado = $asignaciones->map(function ($asignacion) {
+            return [
+                'id_usuario' => $asignacion->compra->usuario->id,
+                'latitud' => $asignacion->compra->usuario->ubicacion->latitud,
+                'longitud' => $asignacion->compra->usuario->ubicacion->longitud,
+                'estado' => $asignacion->estado,
+            ];
+        });
+
+        return $resultado;
+    }
 }

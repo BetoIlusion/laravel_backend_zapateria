@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asignacion;
 use Illuminate\Http\Request;
 use App\Models\Distribuidor;
 use App\Models\User;
 use App\Models\Vehiculo;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Http;
+use App\Models\Ubicacion;
 class DistribuidorController extends Controller
 {
     public function index()
@@ -268,5 +270,112 @@ class DistribuidorController extends Controller
             'message' => 'Vehículo actualizado exitosamente',
             'vehiculo' => $vehiculo
         ], 200);
+    }
+    public function rutasAsignacion()
+    {
+        try {
+            if (!auth()->check()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No autorizado'
+                ], 403);
+            }
+
+            $user = auth()->user();
+            $rutas = Asignacion::asignacionUbicacion($user->id);
+
+            if ($rutas->isEmpty()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'No hay rutas asignadas',
+                    'data' => []
+                ], 200);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Rutas obtenidas correctamente',
+                'data' => $rutas
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error interno del servidor',
+                'error' => $e->getMessage(), // quitar en producción
+                'linea' => $e->getLine()     // quitar en producción
+            ], 500);
+        }
+    }
+
+    public function rutaOptima()
+    {
+        try {
+            $user = auth()->user();
+            if (!$user) {
+                return response()->json(['status' => 'error', 'message' => 'No autorizado'], 403);
+            }
+
+            // Ubicación del distribuidor (inicio)
+            $ubicacion = Ubicacion::where('id_usuario', $user->id)->first();
+            if (!$ubicacion) {
+                return response()->json(['status' => 'error', 'message' => 'Ubicación no encontrada'], 404);
+            }
+
+            // Clientes a entregar
+            $clientes = Asignacion::asignacionUbicacion($user->id);
+            if ($clientes->isEmpty()) {
+                return response()->json(['status' => 'success', 'message' => 'Sin asignaciones', 'data' => []], 200);
+            }
+
+            // Coordenadas formateadas para OSRM
+            $puntos = collect([[
+                'id_usuario' => $user->id,
+                'latitud' => $ubicacion->latitud,
+                'longitud' => $ubicacion->longitud
+            ]])->concat($clientes);
+
+            $coordString = $puntos->map(fn($p) => "{$p['longitud']},{$p['latitud']}")->implode(';');
+
+            $url = "https://router.project-osrm.org/trip/v1/driving/{$coordString}?source=first&roundtrip=false&overview=full&geometries=geojson";
+
+            $osrmResp = Http::timeout(10)->get($url);
+            if (!$osrmResp->successful()) {
+                return response()->json(['status' => 'error', 'message' => 'Error OSRM'], 500);
+            }
+
+            $data = $osrmResp->json();
+            $trip = $data['trips'][0] ?? null;
+            if (!$trip) {
+                return response()->json(['status' => 'error', 'message' => 'Ruta no generada'], 500);
+            }
+
+            // Relacionar waypoint.index con id_usuario
+            $orden = collect($data['waypoints'])->sortBy('waypoint_index')->pluck('waypoint_index');
+            $ordenUsuarios = collect($data['waypoints'])->sortBy('waypoint_index')->pluck('waypoint_index')->map(function ($i) use ($puntos) {
+                return $puntos[$i]['id_usuario'];
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'geometry' => $trip['geometry']['coordinates'],
+                    'orden_optimizado' => $ordenUsuarios,
+                    'waypoints' => $data['waypoints'],
+                    'clientes_completos' => $clientes,
+                    'origen' => [
+                        'latitud' => $ubicacion->latitud,
+                        'longitud' => $ubicacion->longitud,
+                        'id_usuario' => $user->id
+                    ]
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error interno',
+                'detalle' => $e->getMessage(),
+                'linea' => $e->getLine()
+            ], 500);
+        }
     }
 }

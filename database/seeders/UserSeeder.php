@@ -28,6 +28,49 @@ class UserSeeder extends Seeder
             'longitud' => -63.1657,
             'id_usuario' => $user->id
         ]);
+
+        $user = User::factory()->create([
+            'name' => 'beto',
+            'telefono' => '7989384',
+            'email' => 'beto@gmail.com',
+            'rol' => 'cliente',
+            'password' => bcrypt('123456789')
+        ]);
+        Ubicacion::create([
+            'latitud' => -17.7622 + 0.009,        // 1 km al norte
+            'longitud' => -63.1657,
+            'id_usuario' => $user->id
+        ]);
+
+        $user = User::factory()->create([
+            'name' => 'calderon',
+            'telefono' => '7989384',
+            'email' => 'calderon@gmail.com',
+            'rol' => 'cliente',
+            'password' => bcrypt('123456789')
+        ]);
+        Ubicacion::create([
+            'latitud' => -17.7622,
+            'longitud' => -63.1657 + 0.00946,     // 1 km al este
+            'id_usuario' => $user->id
+        ]);
+
+        $user = User::factory()->create([
+            'name' => 'lehonti',
+            'telefono' => '7989384',
+            'email' => 'lehonti@gmail.com',
+            'rol' => 'cliente',
+            'password' => bcrypt('123456789')
+        ]);
+        Ubicacion::create([
+            'latitud' => -17.7622 - 0.009,        // 1 km al sur
+            'longitud' => -63.1657 - 0.00946,     // 1 km al oeste (combinado para variar)
+            'id_usuario' => $user->id
+        ]);
+
+
+
+        // DISTRIBUIDORES
         $user = User::factory()->create([
             'name' => 'dist 1',
             'telefono' => '7989384',
@@ -53,31 +96,31 @@ class UserSeeder extends Seeder
             'id_distribuidor' => $distribuidor->id
         ]);
 
-        $user = User::factory()->create([
-            'name' => 'dist 2',
-            'telefono' => '7989384',
-            'email' => 'dist2@gmail.com',
-            'rol' => 'distribuidor',
-            'password' => bcrypt('123456789')
-        ]);
-        Ubicacion::create([
-            'latitud' => -17.7705,
-            'longitud' => -63.1808,
-            'id_usuario' => $user->id
-        ]);
-        $distribuidor = Distribuidor::create([
-            'estado_disponibilidad' => 'libre',
-            'id_usuario' => $user->id
-        ]);
-        
-        Vehiculo::create([
-            'marca' => 'nissan',
-            'modelo' => 'np300',
-            'placa' => '456DEF',
-            'capacidad_carga' => '40',
-            'anio' => '2015',
-            'id_distribuidor' => $distribuidor->id
-        ]);
+        // $user = User::factory()->create([
+        //     'name' => 'dist 2',
+        //     'telefono' => '7989384',
+        //     'email' => 'dist2@gmail.com',
+        //     'rol' => 'distribuidor',
+        //     'password' => bcrypt('123456789')
+        // ]);
+        // Ubicacion::create([
+        //     'latitud' => -17.7705,
+        //     'longitud' => -63.1808,
+        //     'id_usuario' => $user->id
+        // ]);
+        // $distribuidor = Distribuidor::create([
+        //     'estado_disponibilidad' => 'libre',
+        //     'id_usuario' => $user->id
+        // ]);
+
+        // Vehiculo::create([
+        //     'marca' => 'nissan',
+        //     'modelo' => 'np300',
+        //     'placa' => '456DEF',
+        //     'capacidad_carga' => '40',
+        //     'anio' => '2015',
+        //     'id_distribuidor' => $distribuidor->id
+        // ]);
 
         // $user = User::factory()->create([
         //     'name' => 'dist 3',
@@ -95,7 +138,7 @@ class UserSeeder extends Seeder
         //     'estado_disponibilidad' => 'libre',
         //     'id_usuario' => $user->id
         // ]);
-        
+
         // Vehiculo::create([
         //     'marca' => 'ford',
         //     'modelo' => 'f150',
@@ -121,7 +164,7 @@ class UserSeeder extends Seeder
         //     'estado_disponibilidad' => 'libre',
         //     'id_usuario' => $user->id
         // ]);
-        
+
         // Vehiculo::create([
         //     'marca' => 'chevrolet',
         //     'modelo' => 'silverado',

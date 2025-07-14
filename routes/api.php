@@ -70,6 +70,7 @@ Route::get('/producto/{id}', [ProductoController::class, 'show']);
 //el actualizar esta dentro del middleware
 
 
+
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
@@ -78,19 +79,18 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put('/producto/{id}', [ProductoController::class, 'update']);
     // ---------------------------------------
     // @RUTAS USUARIOS/CLIENTES/ADMIN/DISTRIBUIDORES
-    // ---------------------------------------
+    // ---------------------------------------                                      
     //CRUD
     Route::resource('/cliente', Controller::class);
 
     Route::post('/ubicacion', [Controller::class, 'updateUbicacion']);
 
+    Route::get('/ubicacion-mia', [Controller::class, 'getUbicacionMia']);
 
     Route::get('/vehiculo', [DistribuidorController::class, 'getVehiculo']);
     Route::post('/vehiculo', [DistribuidorController::class, 'updateVehiculo']);
 
     Route::get('/asignacion/{id}/estado/{estado}', [AsignacionController::class, 'cambiarEstado']);
-
-
 
     // =============================================
     // @RUTAS DE COMPRA
@@ -114,6 +114,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // //de comparacion de volumenes de entrega Compra-Distribuidor
     // Route::post('/asignacion', [AsignacionController::class, 'insertar']);
     Route::get('/asignacion', [AsignacionController::class, 'mostrar']);
+    // =============================================
+    // @RUTAS DE DISTRIBUIDOIR
+    // =============================================
+    Route::get('/distribuidor-rutas', [DistribuidorController::class, 'rutasAsignacion']);
+    Route::get('/distribuidor-ruta-optima', [DistribuidorController::class, 'rutaOptima']);
 
     Route::patch('/distribuidor/estado', [DistribuidorController::class, 'cambiarEstado']);
     Route::get('/distribuidor/estado', [DistribuidorController::class, 'obtenerEstado']);
