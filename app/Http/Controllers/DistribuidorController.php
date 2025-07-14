@@ -308,74 +308,79 @@ class DistribuidorController extends Controller
     }
 
     public function rutaOptima()
-    {
-        try {
-            $user = auth()->user();
-            if (!$user) {
-                return response()->json(['status' => 'error', 'message' => 'No autorizado'], 403);
-            }
-
-            // Ubicación del distribuidor (inicio)
-            $ubicacion = Ubicacion::where('id_usuario', $user->id)->first();
-            if (!$ubicacion) {
-                return response()->json(['status' => 'error', 'message' => 'Ubicación no encontrada'], 404);
-            }
-
-            // Clientes a entregar
-            $clientes = Asignacion::asignacionUbicacion($user->id);
-            if ($clientes->isEmpty()) {
-                return response()->json(['status' => 'success', 'message' => 'Sin asignaciones', 'data' => []], 200);
-            }
-
-            // Coordenadas formateadas para OSRM
-            $puntos = collect([[
-                'id_usuario' => $user->id,
-                'latitud' => $ubicacion->latitud,
-                'longitud' => $ubicacion->longitud
-            ]])->concat($clientes);
-
-            $coordString = $puntos->map(fn($p) => "{$p['longitud']},{$p['latitud']}")->implode(';');
-
-            $url = "https://router.project-osrm.org/trip/v1/driving/{$coordString}?source=first&roundtrip=false&overview=full&geometries=geojson";
-
-            $osrmResp = Http::timeout(10)->get($url);
-            if (!$osrmResp->successful()) {
-                return response()->json(['status' => 'error', 'message' => 'Error OSRM'], 500);
-            }
-
-            $data = $osrmResp->json();
-            $trip = $data['trips'][0] ?? null;
-            if (!$trip) {
-                return response()->json(['status' => 'error', 'message' => 'Ruta no generada'], 500);
-            }
-
-            // Relacionar waypoint.index con id_usuario
-            $orden = collect($data['waypoints'])->sortBy('waypoint_index')->pluck('waypoint_index');
-            $ordenUsuarios = collect($data['waypoints'])->sortBy('waypoint_index')->pluck('waypoint_index')->map(function ($i) use ($puntos) {
-                return $puntos[$i]['id_usuario'];
-            });
-
-            return response()->json([
-                'status' => 'success',
-                'data' => [
-                    'geometry' => $trip['geometry']['coordinates'],
-                    'orden_optimizado' => $ordenUsuarios,
-                    'waypoints' => $data['waypoints'],
-                    'clientes_completos' => $clientes,
-                    'origen' => [
-                        'latitud' => $ubicacion->latitud,
-                        'longitud' => $ubicacion->longitud,
-                        'id_usuario' => $user->id
-                    ]
-                ]
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Error interno',
-                'detalle' => $e->getMessage(),
-                'linea' => $e->getLine()
-            ], 500);
+{
+    try {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['status' => 'error', 'message' => 'No autorizado'], 403);
         }
+
+        // Obtener ubicación del distribuidor (inicio)
+        $ubicacion = Ubicacion::where('id_usuario', $user->id)->first();
+        if (!$ubicacion) {
+            return response()->json(['status' => 'error', 'message' => 'Ubicación no encontrada'], 404);
+        }
+
+        // Obtener clientes asignados con detalles y ubicación
+        $clientes = Asignacion::asignacionUbicacion2($user->id);
+        if ($clientes->isEmpty()) {
+            return response()->json(['status' => 'success', 'message' => 'Sin asignaciones', 'data' => []], 200);
+        }
+
+        // Construir lista de puntos para OSRM (origen + clientes)
+        $puntos = collect([[
+            'id_usuario' => $user->id,
+            'latitud' => $ubicacion->latitud,
+            'longitud' => $ubicacion->longitud
+        ]])->concat(
+            $clientes->map(fn($c) => [
+                'id_usuario' => $c['id_usuario'],
+                'latitud' => $c['latitud'],
+                'longitud' => $c['longitud'],
+            ])
+        );
+
+        $coordString = $puntos->map(fn($p) => "{$p['longitud']},{$p['latitud']}")->implode(';');
+        $url = "https://router.project-osrm.org/trip/v1/driving/{$coordString}?source=first&roundtrip=false&overview=full&geometries=geojson";
+
+        $osrmResp = Http::timeout(10)->get($url);
+        if (!$osrmResp->successful()) {
+            return response()->json(['status' => 'error', 'message' => 'Error OSRM'], 500);
+        }
+
+        $data = $osrmResp->json();
+        $trip = $data['trips'][0] ?? null;
+        if (!$trip) {
+            return response()->json(['status' => 'error', 'message' => 'Ruta no generada'], 500);
+        }
+
+        $ordenUsuarios = collect($data['waypoints'])
+            ->sortBy('waypoint_index')
+            ->pluck('waypoint_index')
+            ->map(fn($i) => $puntos[$i]['id_usuario']);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'geometry' => $trip['geometry']['coordinates'],
+                'orden_optimizado' => $ordenUsuarios,
+                'waypoints' => $data['waypoints'],
+                'clientes_completos' => $clientes,
+                'origen' => [
+                    'latitud' => $ubicacion->latitud,
+                    'longitud' => $ubicacion->longitud,
+                    'id_usuario' => $user->id
+                ]
+            ]
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Error interno',
+            'detalle' => $e->getMessage(),
+            'linea' => $e->getLine()
+        ], 500);
     }
+}
+
 }

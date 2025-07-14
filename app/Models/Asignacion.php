@@ -190,4 +190,31 @@ class Asignacion extends Model
 
         return $resultado;
     }
+    public static function asignacionUbicacion2($id_user)
+{
+    $distribuidor = Distribuidor::where('id_usuario', $id_user)->first();
+
+    $asignaciones = Asignacion::where('id_distribuidor', $distribuidor->id)
+        ->with('compra.usuario.ubicacion')
+        ->where('estado', 'en curso')
+        ->get();
+
+    return $asignaciones->map(function ($a) {
+        $ubicacion = $a->compra->usuario->ubicacion;
+        return [
+            'id_usuario'      => $a->compra->usuario->id,
+            'latitud'         => $ubicacion->latitud ?? null,
+            'longitud'        => $ubicacion->longitud ?? null,
+            'estado'          => $a->estado,
+            'id_compra'       => $a->id_compra,
+            'id_distribuidor' => $a->id_distribuidor,
+            'fecha_asignada'  => $a->fecha_asignada,
+            'volumen_total'   => $a->compra->volumen_total ?? null,
+            'cliente_nombre'  => $a->compra->usuario->name ?? null,
+            'distancia_km'    => $a->distancia ?? null,
+            'tiempo_min'      => $a->tiempo ?? null,
+        ];
+    })->filter(fn($c) => is_numeric($c['latitud']) && is_numeric($c['longitud']))->values();
+}
+
 }
